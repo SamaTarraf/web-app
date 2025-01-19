@@ -41,8 +41,9 @@ def generate_text(question):
 
 @app.route("/bot", methods=['POST'])
 def bot():
-    question = request.json['message']
-    return(jsonify({'reply' : generate_text(question)}))
+    question = request.json['query']
+    return(jsonify({'text' : generate_text(question)}))
+    #return(jsonify({'text' : 'I am the bot'}))
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

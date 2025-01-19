@@ -1,57 +1,43 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 
-const Chatbot = () => {
-  const [message, setMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState([{
-    sender: '',
+export default function Chatbot() {
+  const [question, setQuestion] = useState('');
+  const [history, setHistory] = useState([{
+    role: '',
     text: ''
   }]);
 
-  const handleSend = async () => {
-    if (!message.trim()) return;
+  const getResponse = async () => {
+    //question into history
+    setHistory([...history, {role: 'user', text: question}]);
 
-    // Add user message to the chat history
-    setChatHistory([...chatHistory, { sender: 'user', text: message }]);
+    //get response
+    const response = await axios.post('http://localhost:5000/bot', {query: question});
 
-    try {
-      // Send user message to Flask API
-      const response = await axios.post('http://localhost:5000/bot', {
-        message: message
-      });
+    //response into history
+    setHistory([...history, {role: 'user', text: question}, {role: 'bot', text: response.data.text}]);
 
-      // Add chatbot's reply to the chat history
-      setChatHistory([...chatHistory, { sender: 'user', text: message }, { sender: 'bot', text: response.data.reply }]);
-    } catch (error) {
-      console.error('Error:', error);
-    }
+    setQuestion('');
 
-    setMessage('');
   };
 
-  return (
-    <div>
-      <div style={{ border: '1px solid #ccc', padding: '10px', height: '400px', overflowY: 'scroll' }}>
-        {chatHistory.map((chat, index) => (
-          <div key={index} style={{ marginBottom: '10px' }}>
-            <strong>{chat.sender === 'user' ? 'You: ' : 'Bot: '}</strong>
-            <span>{chat.text}</span>
-          </div>
-        ))}
+  return(
+      <div className="flex flex-col justify-center w-3/4 h-screen bg-slate-400 absolute left-1/2 -translate-x-1/2">
+        <div className="h-5/6 grow-0 bg-slate-400 overflow-auto">  
+          {history.map((message, i) => (
+            <div key = {i}>
+              <strong>{message.role}:</strong>
+              <span>{message.text}</span>
+            </div>
+          ))}
+        </div>
+        <input type="text" onChange={(e) => setQuestion(e.target.value)} value={question} className="h-1/6 bg-slate-200 rounded-lg"/>
+        <button className="h-10 w-20" onClick={getResponse}>
+          Send
+        </button>
       </div>
-      <div style={{ marginTop: '10px' }}>
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
-        />
-        <button onClick={handleSend}>Send</button>
-      </div>
-    </div>
   );
 };
-
-export default Chatbot;
