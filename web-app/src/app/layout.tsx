@@ -24,11 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className="bg-slate-800"
-      >
+      <body className="bg-slate-800">
         {children}
       </body>
     </html>
   );
 }
+ 
