@@ -1,7 +1,7 @@
 'use client'
 
 import React, {useState, useEffect, useRef} from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
 export default function SignUp() {
@@ -10,8 +10,10 @@ export default function SignUp() {
     const [isUsernameExisting, setIsUsernameExisting] = useState(null);
     const [isUsernameEmpty, setIsUsernameEmpty] = useState(null);
     const [isPasswordInvalid, setIsPasswordInvalid] = useState(null);
+    const [isAccountCreated, setIsAccountCreated]  = useState(false);
     const isFirstRender = useRef(true);
-    const navigate = useNavigate();
+    const router = useRouter();
+    
 
 
     const checkFields = async () => {
@@ -56,9 +58,10 @@ export default function SignUp() {
                         console.log("account exists")
                     }
                     else{
+                        setIsAccountCreated(true);
                         setIsUsernameExisting(false);
                         console.log("account created");
-                        navigate('/logIn');
+                        router.push('/dashboard?isAccountCreated=${encodeURIComponent(isAccountCreated)}`');
                         
                     }
                 }

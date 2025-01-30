@@ -24,6 +24,14 @@ export default function Home() {
         >
           Sign up
         </a>
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          href="\login"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Log In
+        </a>
       </footer>
     </div>
   );

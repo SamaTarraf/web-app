@@ -1,5 +1,3 @@
-from flask import Flask, request, jsonify 
-from flask_cors import CORS
 import os
 import bcrypt
 from supabase import create_client
@@ -31,14 +29,18 @@ def createAccount(username, password):
         #return(jsonify({'isAccountCreated' : False}))
         return False
     
-    supabase.table("accounts").select("username").eq("username", username).execute()
+    #supabase.table("accounts").select("username").eq("username", username).execute()
 
     salt = bcrypt.gensalt()
 
     ##insert account to the table with a new id
     response = supabase.table("accounts").select("id").order("created_at", desc=True).limit(1).execute()
-    id = response.data[0].get('id')+1
-    supabase.table("accounts").insert({"id": id, "username": username, "password": bcrypt.hashpw(password,salt).decode('utf-8')}).execute()
+    if(response.data==[]):
+        id = 1
+    else:
+        id = response.data[0].get('id')+1
+
+    supabase.table("accounts").insert({"id": id, "username": username, "password": bcrypt.hashpw(password,salt).decode()}).execute()
 
     #return(jsonify({'isAccountCreated' : True}))
     return True
