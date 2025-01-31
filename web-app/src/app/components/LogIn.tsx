@@ -18,7 +18,7 @@ export default function LogIn() {
 
     const checkFields = () => {
         //setIsUsernameEmpty(null);
-        //ssetIsPasswordEmpty(null);
+        //setIsPasswordEmpty(null);
 
         if(username.trim().length===0 || username.length===0){
             console.log("username is empty")
@@ -38,6 +38,8 @@ export default function LogIn() {
             setIsPasswordEmpty(false);
         }
         
+        //setIsUsernameEmpty(null);
+        //setIsPasswordEmpty(null);
 
     }
 
@@ -49,7 +51,8 @@ export default function LogIn() {
 
         if(!isFirstRender.current){
             const logIn = async() => {
-                if(!(isUsernameEmpty || isPasswordEmpty) && !(isUsernameEmpty==null || isPasswordEmpty==null)){
+                //if(!(isUsernameEmpty || isPasswordEmpty) && !(isUsernameEmpty==null || isPasswordEmpty==null)){
+                if(!(isUsernameEmpty || isPasswordEmpty)){
                         const response = await axios.post('http://localhost:5000/logIn' , {user: username, password: password});
 
                         console.log("username exists:", response.data.isUsernameExisting)
@@ -86,7 +89,9 @@ export default function LogIn() {
 
         isFirstRender.current = false;
         console.log("isfirstrender2:", isFirstRender.current);
-    },[isUsernameEmpty, isPasswordEmpty, usernameNotFound, passwordNotVerified]);
+    //},[isUsernameEmpty, isPasswordEmpty, usernameNotFound, passwordNotVerified]);
+    },[isUsernameEmpty, isPasswordEmpty]);
+
 
     return(
         <div className="flex flex-col justify-center w-3/4 h-screen bg-slate-400 absolute left-1/2 -translate-x-1/2">
