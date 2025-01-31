@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react';
-import NewLogIn from '@/app/components/NewLogIn';
+import LogIn from '@/app/components/LogIn';
 import { useSearchParams } from 'next/navigation';
 
 export default function LogInPage() {
@@ -15,7 +15,7 @@ export default function LogInPage() {
                 {isAccountCreated && (
                     <div className="text-white">your account has been created, please log in</div>
                 )}  
-                <NewLogIn/>
+                <LogIn/>
             </div>
           </div>
         </main>       
