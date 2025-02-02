@@ -2,7 +2,7 @@
 
 import React, {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 
 export default function NewLogIn() {
     const [username, setUsername] = useState('');
@@ -12,7 +12,6 @@ export default function NewLogIn() {
 
     const checkFields = async() => {
             if(username.trim().length===0 || username.length===0 || password.trim().length===0 || password.length===0){
-                console.log("a feild is empty")
                 setError("Fill in both username and password fields");
                 return;
             }
@@ -20,18 +19,16 @@ export default function NewLogIn() {
             const response = await axios.post('http://localhost:5000/logIn' , {user: username, password: password});
 
             if(!response.data.isUsernameExisting){
-                setError("Username doesnt exist")
+                setError("Username does not exist")
             }
             else if(!response.data.isPasswordVerified){
                 setError("Password is not valid")
             }
             else{
+                await axios.post('http://localhost:5000/initializeSession' , {user: username}, {withCredentials: true});
                 router.push('/dashboard');
-            }
 
-
-        
-
+            }  
     }
 
     return(

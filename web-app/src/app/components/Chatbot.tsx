@@ -2,6 +2,7 @@
 
 import React, {useState} from 'react';
 import axios from 'axios';
+import {useRouter} from 'next/navigation';
 
 export default function Chatbot() {
   const [question, setQuestion] = useState('');
@@ -9,6 +10,8 @@ export default function Chatbot() {
     role: '',
     text: ''
   }]);
+  const[error, setError] = useState();
+  const router = useRouter();
 
   const getResponse = async () => {
     //question into history
@@ -24,8 +27,21 @@ export default function Chatbot() {
 
   };
 
+  const authenticate = async() => {
+    const response = await axios.post('http://localhost:5000/authenticate', {}, {withCredentials: true});
+
+    if(response.data.isTokenValid){
+        router.push('/dashboard');
+    }
+    else{
+        setError(response.data.error);
+        router.push('/login');
+    }
+  }
+
   return(
       <div className="flex flex-col justify-center w-3/4 h-screen bg-slate-400 absolute left-1/2 -translate-x-1/2">
+        <button className="text-white" onClick={authenticate}>Dashboard</button>
         <div className="h-5/6 grow-0 bg-slate-400 overflow-auto">  
           {history.map((message, i) => (
             <div key = {i}>
