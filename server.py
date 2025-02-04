@@ -7,6 +7,11 @@ from AccountAccess.logIn import verify_account, verify_username
 from AccountAccess.tokens import generate_jwt, get_access_token
 import jwt
 import os
+from supabase import create_client
+
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_SERVICE_KEY")
+supabase = create_client(url,key)
 
 refreshKey = os.getenv("REFRESH_KEY")
 accessKey = os.getenv("ACCESS_KEY")
@@ -19,6 +24,7 @@ CORS(app, supports_credentials=True)
 def bot():
     question = request.json['query']
     #return(jsonify({'text' : generate_text(question)}))
+
     return(jsonify({'text' : 'I am the bot'}))
 
 @app.route("/signUp", methods=['POST'])
@@ -81,9 +87,70 @@ def authenticate():
             response.set_cookie(key="accessToken", value=accessToken, httponly=True, secure=True, samesite="Lax", max_age=30 * 60)
             return response
     
+@app.route("/createChat", methods=['POST'])
+def createChat():
+    title = request.json['title']
+    username = request.json['user']
+
+    account = supabase.table("accounts").select("*").eq("username", username).execute()
+    
+    userid = account.data[0].get('user_id')
+    
+    response = supabase.table("chats").select("chat_id").order("created_at", desc=True).limit(1).execute()
+    if(response.data==[]):
+        id = 1
+    else:
+        id = response.data[0].get('chat_id')+1
+
+    
+    supabase.table("chats").insert({"chat_id": id, "user_id": userid, "title": title}).execute()
+    return jsonify({"isChatCreated": True})
+    
+@app.route("/listChats", methods=['POST'])
+def listChats():
+    username = request.json['user']
+    
+    account = supabase.table("accounts").select("*").eq("username", username).execute()
+    
+    userid = account.data[0].get('user_id')
+
+    chats = supabase.table("chats").select("title").eq("user_id", userid).execute()
+    
+    titles = [chat["title"] for chat in chats.data]
+
+    return jsonify({'chats': titles})
+    
+@app.route("/saveMessage", methods=['POST'])
+def saveMessages():
+    username = request.json['username']
+    title = request.json['title']
+    sender = request.json['sender']
+    message = request.json['message']
+
+    account = supabase.table("accounts").select("*").eq("username", username).execute()
+    userid = account.data[0].get('user_id')
+
+    chats = supabase.table("chats").select("*").eq("user_id", userid).eq("title", title).execute()
+    chatid = chats.data[0].get('chat_id')
+
+    response = supabase.table("messages").select("messages_id").order("created_at", desc=True).execute()
+    if(response.data==[]):
+        id = 1
+    else:
+        id = response.data[0].get('messages_id')+1
+
+    supabase.table("messages").insert({"messages_id": id, "chat_id": chatid, "sender": sender, "message": message}).execute()
+
+    messages = supabase.table("messages").select("*").eq("chat_id", chatid).order("created_at", desc=False).execute()
+
+    messagesArray = [{"sender": msg["sender"], "message": msg["message"]} for msg in messages.data]
+
+    return(jsonify({'history': messagesArray}))
 
 
-           
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

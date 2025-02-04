@@ -19,12 +19,12 @@ def create_Account(username, password):
     salt = bcrypt.gensalt()
 
     ##insert account to the table with a new id
-    response = supabase.table("accounts").select("id").order("created_at", desc=True).limit(1).execute()
+    response = supabase.table("accounts").select("user_id").order("created_at", desc=True).limit(1).execute()
     if(response.data==[]):
         id = 1
     else:
-        id = response.data[0].get('id')+1
+        id = response.data[0].get('user_id')+1
 
-    supabase.table("accounts").insert({"id": id, "username": username, "password": bcrypt.hashpw(password,salt).decode()}).execute()
+    supabase.table("accounts").insert({"user_id": id, "username": username, "password": bcrypt.hashpw(password,salt).decode()}).execute()
 
     return True

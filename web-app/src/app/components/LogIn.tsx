@@ -26,7 +26,7 @@ export default function NewLogIn() {
             }
             else{
                 await axios.post('http://localhost:5000/initializeSession' , {user: username}, {withCredentials: true});
-                router.push('/dashboard');
+                router.push(`/dashboard?username=${encodeURIComponent(username)}`);
 
             }  
     }

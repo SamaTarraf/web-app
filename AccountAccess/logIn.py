@@ -20,11 +20,6 @@ def verify_account(username, password):
     account = supabase.table("accounts").select("*").eq("username", username).execute()
 
     dbPassword = account.data[0]['password']
-    #dbPassword = bytes(account.data[0].get('password'), 'utf-8')
-
-    #salt = bcrypt.genSalt()
-    #password = bcrypt.hashpw(password, salt)
-
 
     if(bcrypt.checkpw(password, dbPassword.encode())):
         print("PASSWORD IS VERIFIED")
